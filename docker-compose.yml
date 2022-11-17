@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  app:
+    platform: "linux/amd64"
+    build: .
+    container_name: app
+    volumes:
+      - .:/usr/src/app
+    command: sh -c 'yarn && yarn dev'
+    networks:
+      - internal
+      - external
+    ports:
+      - '3000:3000'
+      - '8080:8080'
+    tty: true
+
+networks:
+  internal:
+    driver: bridge
+    internal: true
+  external:
+    name: lesson-restapi-todo-nestjs_external
+    external: true
