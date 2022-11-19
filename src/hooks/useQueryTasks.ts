@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Task } from '@prisma/client';
 
-export const useQueryUser = () => {
+export const useQueryTasks = () => {
   const router = useRouter();
 
   const getTasks = async () => {
