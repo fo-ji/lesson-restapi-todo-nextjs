@@ -5,6 +5,8 @@ import { LogoutIcon } from '@heroicons/react/solid';
 import { Layout } from '@/components/Layout';
 import { UserInfo } from '@/components/UserInfo';
 import { useQueryClient } from '@tanstack/react-query';
+import { TaskForm } from '@/components/TaskForm';
+import { TaskList } from '@/components/TaskList';
 
 const Dashboard: NextPage = () => {
   const router = useRouter();
@@ -12,6 +14,7 @@ const Dashboard: NextPage = () => {
 
   const logout = async () => {
     queryClient.removeQueries(['user']);
+    queryClient.removeQueries(['tasks']);
     await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`);
     router.push('/');
   };
@@ -23,6 +26,8 @@ const Dashboard: NextPage = () => {
         onClick={logout}
       />
       <UserInfo />
+      <TaskForm />
+      <TaskList />
     </Layout>
   );
 };
