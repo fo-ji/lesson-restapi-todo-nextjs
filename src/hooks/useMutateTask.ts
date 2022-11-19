@@ -49,7 +49,7 @@ export const useMutateTask = () => {
       onSuccess: (res, variables) => {
         const prevTodos = queryClient.getQueryData<Task[]>(['tasks']);
         if (prevTodos) {
-          queryClient.setQueriesData(
+          queryClient.setQueryData(
             ['tasks'],
             prevTodos.map((task) => (task.id === res.id ? res : task))
           );
@@ -72,7 +72,7 @@ export const useMutateTask = () => {
       onSuccess: (_, variables) => {
         const prevTodos = queryClient.getQueryData<Task[]>(['tasks']);
         if (prevTodos) {
-          queryClient.setQueriesData(
+          queryClient.setQueryData(
             ['tasks'],
             // 実行関数で受け取った引数をvariablesから取得できる（=今回はid）
             prevTodos.filter((task) => task.id !== variables)
