@@ -1,21 +1,21 @@
 import { useRouter } from 'next/router';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { User } from '@prisma/client';
+import { Task } from '@prisma/client';
 
 export const useQueryUser = () => {
   const router = useRouter();
 
-  const getUser = async () => {
-    const { data } = await axios.get<Omit<User, 'hashdPassword'>>(
-      `${process.env.NEXT_PUBLIC_API_URL}/user`
+  const getTasks = async () => {
+    const { data } = await axios.get<Task[]>(
+      `${process.env.NEXT_PUBLIC_API_URL}/todo`
     );
     return data;
   };
 
-  return useQuery<Omit<User, 'hashdPassword'>, Error>({
-    queryKey: ['user'],
-    queryFn: getUser,
+  return useQuery<Task[], Error>({
+    queryKey: ['tasks'],
+    queryFn: getTasks,
     onError: (error: any) => {
       if (error.response.status === 401 || error.response.status === 403)
         router.push('/');
