@@ -1,22 +1,16 @@
 import type { NextPage } from 'next';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import axios from 'axios';
 import * as Yup from 'yup';
 import { IconDatabase } from '@tabler/icons';
 import { ShieldCheckIcon } from '@heroicons/react/solid';
-import { ExclamationCircleIcon } from '@heroicons/react/outline';
-import {
-  Anchor,
-  TextInput,
-  Button,
-  Group,
-  PasswordInput,
-  Alert,
-} from '@mantine/core';
+import { Anchor, TextInput, Button, Group, PasswordInput } from '@mantine/core';
 import { useForm, yupResolver } from '@mantine/form';
 import { Layout } from '@/components/Layout';
 import { AuthForm } from '@/types';
+
+import { axios } from '@/lib/axios';
+import storage from '@/utils/storage';
 
 const schema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('No email provided'),
@@ -28,7 +22,6 @@ const schema = Yup.object().shape({
 const Home: NextPage = () => {
   const router = useRouter();
   const [isRegister, setIsRegister] = useState(false);
-  const [error, setError] = useState('');
 
   const form = useForm<AuthForm>({
     validate: yupResolver(schema),
@@ -40,14 +33,15 @@ const Home: NextPage = () => {
 
   const handleSubmit = async () => {
     try {
+      await getCsrfToken();
       if (isRegister) {
-        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, {
+        await axios.post('/auth/signup', {
           email: form.values.email,
           password: form.values.password,
         });
       }
 
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+      await axios.post('/auth/login', {
         email: form.values.email,
         password: form.values.password,
       });
@@ -55,25 +49,21 @@ const Home: NextPage = () => {
       form.reset();
       router.push('/dashboard');
     } catch (e: any) {
-      setError(e.response.data.message);
+      console.log({ e });
+      storage.clearToken();
     }
+  };
+
+  const getCsrfToken = async () => {
+    const { data } = await axios.get('/auth/csrf');
+    storage.setToken(data.csrfToken);
   };
 
   return (
     <Layout title="Auth">
-      <ShieldCheckIcon className="h-16 w-16 text-blue-500" />
-      {error && (
-        <Alert
-          my="md"
-          variant="filled"
-          icon={<ExclamationCircleIcon />}
-          title="Authorization Error"
-          color="red"
-          radius="md"
-        >
-          {error}
-        </Alert>
-      )}
+      <div style={{ height: 100, width: 100 }}>
+        <ShieldCheckIcon className="h-16 w-16 text-blue-500" />
+      </div>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <TextInput
           mt="md"
@@ -98,7 +88,6 @@ const Home: NextPage = () => {
             className="text-gray-300"
             onClick={() => {
               setIsRegister((prev) => !prev);
-              setError('');
             }}
           >
             {isRegister
